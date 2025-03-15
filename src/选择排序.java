@@ -17,7 +17,7 @@ public class 选择排序 {
      */
     public static void selectSort(int[] a) {
         // 遍历数组，每次确定一个最小元素的位置
-        for (int i = 0; i < a.length - 1; i++) {
+        for (int i = 0; i < a.length-1 ; i++) {
             // 假设当前位置的元素是最小的
             int min = i;
             // 从当前位置的下一个元素开始，寻找真正的最小元素
