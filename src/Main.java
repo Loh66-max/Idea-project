@@ -1,189 +1,199 @@
 import java.util.Scanner;
 
-// 定义链表节点类
-class Node {
+/* 双链表结点定义 */
+class DulNode {
     int data;
-    Node next;
+    DulNode prior;
+    DulNode next;
 
-    public Node(int data) {
+    DulNode(int data) {
         this.data = data;
+        this.prior = null;
         this.next = null;
     }
 }
 
-// 定义单链表类
-class LinkList {
-    private Node first;
+class DulLinkList {
+    private DulNode first;
 
-    // 无参构造函数
-    public LinkList() {
-        first = new Node(0); // 生成头结点
+    /* 默认构造函数 */
+    public DulLinkList() {
+        first = new DulNode(0); // 生成头结点
+        first.prior = null;
         first.next = null;
     }
 
-    // 有参构造函数
-    public LinkList(int[] a, int n,int flag) {
-        /* 传入一个长度为n的数组a，初始化单链表 */
-        first = new Node(0); // 生成头结点
-        if (flag == 1) { // 头插法
-            for (int i = 0; i < n; i++) {
-                Node s = new Node(a[i]);
-                s.next = first.next;
-                first.next = s;
-            }
-
-        } else if (flag == 0) { // 尾插法
-            Node rear = first;
-            for (int i = 0; i < n; i++) {
-                Node s = new Node(a[i]);
-                rear.next = s;
-                rear = s;
-            }
-            rear.next = null;
-
+    /* 带参构造函数 */
+    public DulLinkList(int[] a, int n) {
+        /* 传入一个长度为n的数组a，初始化线性表，补充尾插法代码 */
+        first = new DulNode(0);
+        DulNode rear = first;
+        for (int i = 0; i < n; i++) {
+            DulNode s = new DulNode(a[i]);
+            rear.next = s;
+            s.prior = rear;
+            rear = s;
         }
+        rear.next = null;
     }
 
-    // 判断单链表是否为空
-    public boolean isEmpty() {
-        /* 头结点的引用域为null时，单链表为空，否则不为空 */
-        return first.next == null ? true : false;
-    }
 
-    public void insert(int i/*插入位置*/, int x/*插入元素*/) {
-        Node p = first; //工作引用p初始化，从头结点开始
-        int local = 0; //local从0开始
-        while (p != null && local < i- 1) {
-            p =p.next;
-            local++;
-        }
-        if (p == null || i < 1 || i > getLength()+1) {
-            System.out.println("The insert position is invalid");; //没有找到第i-1个结点
-        } else {
-            Node s = new Node(x); //完成插入
-            s.next = p.next;
-            p.next = s;
-        }
-    }
-
-    public int delete(int i) {
-        Node p = first;    //工作引用p初始化，从头结点开始
-        int local = 0;//local从0开始
-        while (p != null && local < i- 1) {//查找第i-1个结点
-            p = p.next;
-            local++;
-        }
-        if (i < 1 || p == null || p.next == null) {
-            System.out.println("The delete position is invalid");
-            return -1;
-        } else {
-            Node q = p.next;
-            int x = q.data;
-            p.next = q.next;
-            System.out.println(x); // 输出被删除的数据元素值
-            return x;
-        }
-    }
-
+    /* 返回链表长度 */
     public int getLength() {
-        Node p = first.next;
+        /* 补充获取链表长度的代码 */
+        DulNode rear = first.next;
         int count = 0;
-        while (p != null) {
+        while (rear != null) {
+            rear = rear.next;
             count++;
-            p = p.next;
         }
         return count;
     }
 
+
+    /* 返回链表第i个元素 */
     public int getElement(int i) {
-        /* 位置从1开始计数，若单链表中不存在位置i，返回-1，否则返回该位置的数值 */
-        Node p = first.next;
-        int local = 1;
-        while (p != null && local < i) {
-            p = p.next;
-            local++;
-        }
-        if (p == null || i < 1) {
-            System.out.println("The search position is invalid");
+        /* 位置从1开始计数，若链表中不存在位置i，返回-1，否则返回该位置的数值 */
+        DulNode rear = first.next;
+        if (i < 1) {
             return -1;
-        } else
-            return p.data;
+        }
+        for (int j = 1; rear != null; rear = rear.next, j++) {
+            if (j == i) {
+                return rear.data;
+            }
+        }
+        return -1;
+
+
     }
 
+    /* 返回元素x第一次出现的位置 */
     public int locate(int x) {
-        /* 位置从1开始计数，若单链表中没有元素x，返回-1，若查找成功，返回序号*/
-        Node p = first.next;    //从第一个元素结点开始
-        int local = 1;
-        while (p != null) {
-            if (p.data == x)
-                return local;
-            p = p.next;
-            local++;
+        /* 位置从1开始计数，若链表中没有元素x，返回-1，若查找成功，返回序号*/
+        DulNode rear = first.next;
+        for (int j = 1; rear != null; rear = rear.next, j++) {
+            if (rear.data == x) {
+                return j;
+            }
         }
-        System.out.println("The element being searched for does not exist");
         return -1;
     }
 
+
+    /* 在位置i处插入元素x */
+    public void insert(int i, int x) {
+    if (i < 1) return;
+
+    DulNode rear = first;
+    for (int j = 0; rear != null && j< i - 1; j++) {
+        rear= rear.next;
+    }
+
+    if (rear == null) return;
+
+    DulNode newNode = new DulNode(x);
+    newNode.next = rear.next;
+    newNode.prior = rear;
+
+    if (rear.next != null) {
+        rear.next.prior = newNode;
+    }
+    rear.next = newNode;
+}
+
+
+
+    /* 删除并返回位置i的元素 */
+    public int delete(int i) {
+        /* 位置从1开始计数，若删除位置错误，则什么都不用做并返回-1 */
+        if (i < 1) return -1;
+
+        DulNode rear = first.next;
+        for (int j = 1; rear != null; rear = rear.next, j++) {
+            if (j == i) {
+                rear.prior.next = rear.next;
+                if (rear.next != null) {
+                    rear.next.prior = rear.prior;
+                }
+                return rear.data;
+            }
+        }
+        return -1;
+    }
+
+
+    /* 返回链表是否为空 */
+    public boolean isEmpty() {
+        return first.prior == null && first.next == null;
+    }
+
+    /* 输出链表 */
     public void printList() {
         /* 如果链表为空，则什么都不输出 */
         /* 链表元素每两个之间用空格隔开，最后一个元素后没有空格，然后换行 */
-        if (isEmpty()) {
+        if (isEmpty()){
             return;
         }
-        Node p = first.next;
-        while (p != null && p.next != null) {
-            System.out.print(p.data + " ");
-            p = p.next;
+        DulNode rear = first.next;
+        while (rear!=null&&rear.next!=null){
+            System.out.print(rear.data+" ");
+            rear = rear.next;
         }
-        System.out.println(p.data);
-
+        System.out.println(rear.data);
     }
 }
+
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int n = scanner.nextInt();
-        int flag = scanner.nextInt();
         int[] a = new int[n];
         for (int i = 0; i < n; i++) {
             a[i] = scanner.nextInt();
         }
-        LinkList linkList = new LinkList(a, n, flag);
-        int need = 1;
-        while (need != 0) {
-            need = scanner.nextInt();
-            if (need == 2) {
-                // 删除操作（方法内部已处理输出）
-                int i = scanner.nextInt();
-                linkList.delete(i); // 直接调用，不额外输出
-            } else if (need == 1) {
-                // 插入操作（方法内部已处理非法提示）
-                int i = scanner.nextInt();
-                int x = scanner.nextInt();
-                linkList.insert(i, x);
-            } else if (need == 3) {
-                // 按位查找（成功时输出值，失败时方法内已提示）
-                int index = scanner.nextInt();
-                int element = linkList.getElement(index);
-                if (element != -1) {
-                    System.out.println(element);
-                }
-            } else if (need == 4) {
-                // 按值查找（成功时输出位置，失败时方法内已提示）
-                int x = scanner.nextInt();
-                int position = linkList.locate(x);
-                if (position != -1) {
-                    System.out.println(position);
-                }
-            } else if (need == 5) {
-                // 获取长度（直接输出）
-                System.out.println(linkList.getLength());
-            } else if (need == 6) {
-                // 输出链表（方法内部已处理格式）
-                linkList.printList();
-            } else if (need == 0) {
-                break;
+        DulLinkList linkList = new DulLinkList(a, n);
+        while (scanner.hasNextInt()) {
+            int index, value;
+            int operate = scanner.nextInt();
+            switch (operate) {
+                case 1:
+                    System.out.println("length = " + linkList.getLength());
+                    break;
+                case 2:
+                    index = scanner.nextInt();
+                    System.out.println("local " + index + " data = " + linkList.getElement(index));
+                    break;
+                case 3:
+                    value = scanner.nextInt();
+                    System.out.println("data " + value + " local = " + linkList.locate(value));
+                    break;
+                case 4:
+                    index = scanner.nextInt();
+                    value = scanner.nextInt();
+                    linkList.insert(index, value);
+                    System.out.print("list = ");
+                    linkList.printList();
+                    break;
+                case 5:
+                    index = scanner.nextInt();
+                    System.out.println("delete data = " + linkList.delete(index));
+                    System.out.print("deleted list = ");
+                    linkList.printList();
+                    break;
+                case 6:
+                    int intValue = linkList.isEmpty() ? 1 : 0;
+                    System.out.println("list is empty = " + intValue);
+                    break;
+                case 7:
+                    System.out.print("data = ");
+                    linkList.printList();
+                    break;
+                default:
+                    System.out.println("end");
+                    scanner.close();
+                    return;
             }
         }
         scanner.close();
